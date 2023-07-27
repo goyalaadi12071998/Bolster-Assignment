@@ -1,13 +1,8 @@
 const User = require('../models/user-model')
+const { FindOne } = require('../providers/db/queries')
 
 const FindOneUser = async (filter) => {
-    try {
-        res = await User.findOne(filter)
-        return res  
-    } catch (err) {
-        console.log(err)
-        throw new Error('Unk')
-    }
+    return await FindOne(User, filter)
 }
 
 module.exports = {FindOneUser}

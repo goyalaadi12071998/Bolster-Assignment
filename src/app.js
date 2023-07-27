@@ -16,7 +16,7 @@ const connectDB = require('./providers/db/index');
 const getEnv = require('./common/env')
 const NotFoundHandler = require('./router/middlewares/notfoundhandler-middleware')
 
-const v1routes = require('./router/index') 
+const v1routes = require('./router') 
 
 app.set('trust proxy', 1)
 app.use(helmet())

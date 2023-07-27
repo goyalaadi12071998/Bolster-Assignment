@@ -16,6 +16,16 @@ const ChartSchema = new mongoose.Schema({
     data: {
         type: String
     }
+}, {
+    timestamps: true
+}, {
+    toJSON: {
+        transform(doc, ret) {
+          ret.id = ret._id;
+          delete ret._id;
+          delete ret.__v;
+        }
+    }
 })
 
-module.exports = mongoose.Model('Chart', ChartSchema)
+module.exports = mongoose.model('Chart', ChartSchema)

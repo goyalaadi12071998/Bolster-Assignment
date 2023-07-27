@@ -1,4 +1,4 @@
-const Respond = require('../utils/index')
+const {Respond} = require('../utils/index')
 const errors = require('../error/index')
 const userservice = require('../user/service')
 const tokenservice = require('../token/index')
@@ -20,15 +20,9 @@ const LoginUser = async (req, res) => {
         const payload = await userservice.LoginUser(loginData)
         const token = await tokenservice.CreateAccessTokenForUser(payload)
         
-        res.set('X-USER-ID', payload._id)
-        res.cookie("access_token", token, {
-            httpOnly: true,
-            secure: true,
-        })
-        res.cookie("refresh_token", token.refreshToken, {
-            httpOnly: true,
-            secure: true
-        })
+        res.set('X-User-Id', payload._id)
+        res.set('X-Access-Token', token.accessToken)
+        res.set('X-Refresh-Token', token.refreshToken)
         
         Respond(req, res, payload, null)
     } catch (err) {
@@ -36,6 +30,17 @@ const LoginUser = async (req, res) => {
     }
 }
 
+const RefreshToken = async (req, res) => {
+    try {
+        const token = tokenservice.GenerateAccessTokenForValidRefreshToken(req)
+        res.set('X-Access-Token', token)
+        Respond(req, res, null, null)
+    } catch (error) {
+        Respond(req, res, null, err)
+    }
+}
+
 module.exports = {
-    LoginUser
+    LoginUser,
+    RefreshToken
 }
