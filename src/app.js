@@ -7,6 +7,7 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const xss = require('xss-clean');
 const cors = require('cors');
+const cookieParser = require("cookie-parser");
 const mongoSanitize = require('express-mongo-sanitize');
 const bodyParser = require('body-parser');
 
@@ -23,6 +24,7 @@ app.use(xss())
 app.use(cors())
 app.use(morgan())
 app.use(mongoSanitize())
+app.use(cookieParser())
 app.use(bodyParser.json())
 app.use('/api/v1', v1routes)
 app.use(NotFoundHandler)
@@ -32,7 +34,7 @@ const configs = getConfigs(env)
 
 const start = async () => {
     try {
-        // await connectDB(configs.db.MongoUrl)
+        await connectDB(configs.db.MongoUrl)
         var server = app.listen(configs.core.Port, () => {console.log("Server is listening on port: ", configs.core.Port)})
 
         process.on("SIGTERM", () => {
