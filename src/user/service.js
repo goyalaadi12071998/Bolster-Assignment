@@ -1,6 +1,6 @@
 const utils = require('../utils/index')
 
-const { BadRequestError } = require('../error')
+const { BadRequestError, InternalServerError } = require('../error')
 const usercore = require('./core')
 
 const LoginUser = async (loginData) => {
@@ -19,4 +19,12 @@ const LoginUser = async (loginData) => {
     return user
 }
 
-module.exports = {LoginUser}
+const GetProfileData = async (data) => {
+    let filter = {_id: data.userid}
+    return await usercore.FindOneUser(filter)
+}
+
+module.exports = {
+    LoginUser,
+    GetProfileData
+}

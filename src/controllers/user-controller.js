@@ -30,9 +30,24 @@ const LoginUser = async (req, res) => {
     }
 }
 
+const GetProfileData = async (req, res) => {
+    const userid = req.userid
+    const data = {
+        userid: userid
+    }
+    try {
+        const paylaod = await userservice.GetProfileData(data)
+        Respond(req, res, paylaod, null) 
+    } catch (error) {
+        Respond(req, res, null, error)
+    }
+}
+
 const RefreshToken = async (req, res) => {
     try {
-        const token = tokenservice.GenerateAccessTokenForValidRefreshToken(req)
+        const userid = req.headers['X-User-Id']
+        const refreshToken = req.headers['X-Refresh-Token']
+        const token = tokenservice.GenerateAccessTokenForValidRefreshToken(userid, refreshToken)
         res.set('X-Access-Token', token)
         Respond(req, res, null, null)
     } catch (error) {
@@ -42,5 +57,6 @@ const RefreshToken = async (req, res) => {
 
 module.exports = {
     LoginUser,
-    RefreshToken
+    RefreshToken,
+    GetProfileData
 }

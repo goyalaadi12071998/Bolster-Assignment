@@ -3,50 +3,85 @@ const { BadRequestError } = require("../error");
 
 let jwt_user_token_map = {}
 
+const generateAccessToken = async (accessTokenPayload) => {
+    return await jwt.sign(accessTokenPayload, 'ACCESS_TOKEN_SECRET', {expiresIn: '1h'})
+}
+
+const generateRefreshToken = async (refreshTokenPayload) => {
+    return await jwt.sign(refreshTokenPayload, 'REFRESH_TOKEN_SECRET', {expiresIn: '24h'})
+}
+
+const storeTokenInRedis = async (userid, token) => {
+    // We have to store token in redis
+    // For the time bounding we are creating a map and storing tokens
+
+    const refreshTokenKey = "refresh_token"+userid
+
+    jwt_user_token_map[refreshTokenKey] = token
+}
+
+const getUserTokensFromRedis = async (userid) => {
+    // We have used map insted of redis for coding purpose
+
+    const refreshTokenKey = "refresh_token"+userid
+
+    return jwt_user_token_map[refreshTokenKey]
+}
+
+const isExpired = (expiryUnixTime) => {
+    const currentUnixTime = Date.now()
+    return (expiryUnixTime - currentUnixTime > 0)
+}
+
+
+
 const CreateAccessTokenForUser = async (user) => {
     const payload = {
         id: user._id
     }
-    const accessToken = jwt.sign(payload, 'ACCESS_TOKEN_SECRET', {expiresIn: '1h'})
-    const refreshToken = jwt.sign(payload, 'REFRESH_TOKEN_SECRET', {expiresIn: '24h'})
-
-    await accessToken
-    await refreshToken
+    
+    const accessToken = await generateAccessToken(payload)
+    const refreshToken = await generateRefreshToken(payload)
 
     const token =   {
         accessToken: accessToken,
         refreshToken: refreshToken
     }
 
-    await storeTokenInRedis(user, token.refreshToken)
+    await storeTokenInRedis(user._id, token.refreshToken)
 
     return token
 }
 
-const GetUserTokensFromRedis = async (userid) => {
-    // We have used map insted of redis for coding purpose
-
-    const refreshTokenKey = "refresh_token"+userid
-
-    return refreshTokenKey
-}
-
 const VerifyAccessTokenAndGetData = async (token) => {
     const data = await jwt.verify(token, 'ACCESS_TOKEN_SECRET')
-    const isExpired = isExpired(data.exp)
+    const istokenExpired = isExpired(data.exp)
     const userid = data.id
 
     return {
-        isExpired: isExpired,
+        isExpired: istokenExpired,
         userid: userid
     }
 }
 
-const GenerateAccessTokenForValidRefreshToken = async (refreshToken) => {
-    const userid = req.headers['X-User-Id']
-    const refreshToken = GetUserTokensFromRedis(userid)
+const VerifyRefreshTokenAndGetData = async (token) => {
+    const data = await jwt.verify(token, 'REFRESH_TOKEN_SECRET')
+    const istokenExpired = isExpired(data.exp)
+    const userid = data.id
 
-    const payload = await VerifyAccessTokenAndGetData(refreshToken)
+    return {
+        isExpired: istokenExpired,
+        userid: userid
+    }
+}
+
+const GenerateAccessTokenForValidRefreshToken = async (userid, refreshToken) => {
+    const refreshTokenFromStore = getUserTokensFromRedis(userid)
+    if (!refreshToken) {
+        throw new BadRequestError('Unauthorized Error')
+    }
+
+    const payload = await VerifyRefreshTokenAndGetData(refreshToken)
     if (payload.isExpired) {
         throw new BadRequestError('Refresh Token Expired, Login Again')
     }
@@ -55,27 +90,14 @@ const GenerateAccessTokenForValidRefreshToken = async (refreshToken) => {
         throw new BadRequestError('Sorry I can not do any thing')
     }
 
-    return generateNewAccessToken(userid)
-}
-
-const storeTokenInRedis = async (user, token) => {
-    // We have to store token in redis
-    // For the time bounding we are creating a map and storing tokens
-
-    const refreshTokenKey = "refresh_token"+user._id
-
-    jwt_user_token_map[refreshTokenKey] = token
-}
-
-const isExpired = (expiryUnixTime) => {
-    const currentUnixTime = Date.now()
-    return (expiryUnixTime - currentUnixTime > 0)
-
+    const newpaylaod = {
+        userid: userid
+    }
+    return  await generateAccessToken(newpaylaod)
 }
 
 module.exports = {
     CreateAccessTokenForUser, 
-    GetUserTokensFromRedis,
     VerifyAccessTokenAndGetData,
     GenerateAccessTokenForValidRefreshToken
 }

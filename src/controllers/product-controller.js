@@ -10,4 +10,20 @@ const ListAllProducts = async (req, res) => {
     }
 }
 
-module.exports = {ListAllProducts}
+const FetchUserProducts = async (req, res) => {
+    const data = {
+        userid: req.userid
+    }
+
+    try {
+        const payload = await productservice.FetchUserProducts(data)
+        Respond(req, res, payload, null)
+    } catch (error) {
+        Respond(req, res, null, error)
+    }
+} 
+
+module.exports = {
+    ListAllProducts,
+    FetchUserProducts
+}
