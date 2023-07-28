@@ -5,7 +5,7 @@ const Chart = require('../src/models/analytics')
 const mongoose = require('mongoose');
 
 const loadData = async () => {
-    await mongoose.connect("mongodb+srv://<username>:<password>@cluster0.pykajlg.mongodb.net/?retryWrites=true&w=majority");
+    await mongoose.connect(process.env.MONGO_URL);
     
     console.log("Database Connected")
 
