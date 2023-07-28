@@ -11,18 +11,34 @@ const generateRefreshToken = async (refreshTokenPayload) => {
     return await jwt.sign(refreshTokenPayload, 'REFRESH_TOKEN_SECRET', {expiresIn: '24h'})
 }
 
-const storeTokenInRedis = (userid, token) => {
-    // We have to store token in redis
-    // Because of the time boundation we are creating a map and storing tokens
-    // Only work when system continuosly works because the variable will be reintialized if sever stoppes
+const storeAccessTokenInRedis = (accessToken, userid) => {
+    const accessTokenKey = "access_token"+userid
+    if (jwt_user_token_map[accessTokenKey]) {
+        delete jwt_user_token_map[accessTokenKey]
+    }
 
+    jwt_user_token_map[accessTokenKey] = accessToken
+    return
+}
+
+const storeRefreshTokenInRedis = (refreshToken, userid) => {
     const refreshTokenKey = "refresh_token"+userid
-
     if (jwt_user_token_map[refreshTokenKey]) {
         delete jwt_user_token_map[refreshTokenKey]
     }
     
-    jwt_user_token_map[refreshTokenKey] = token
+    jwt_user_token_map[refreshTokenKey] = refreshToken
+    return
+}
+
+const storeTokenInRedis = (token, userid) => {
+    // We have to store token in redis
+    // Because of the time boundation we are creating a map and storing tokens
+    // Only work when system continuosly works because the variable will be reintialized if sever stoppes
+
+    storeAccessTokenInRedis(token.accessToken, userid)
+    storeRefreshTokenInRedis(token.refreshToken, userid)
+    return
 }
 
 const getUserRefreshTokensFromRedis = (userid) => {
@@ -46,7 +62,7 @@ const CreateAccessTokenForUser = async (user) => {
         refreshToken: refreshToken
     }
 
-    storeTokenInRedis(user._id, token.refreshToken)
+    storeTokenInRedis(token, user._id)
 
     return token
 }
@@ -96,13 +112,16 @@ const GenerateAccessTokenForValidRefreshToken = async (userid, refreshToken) => 
             id: payload.userid
         }
 
-        return  await generateAccessToken(newpaylaod)
+        const newaccessToken =  await generateAccessToken(newpaylaod)
+        storeAccessTokenInRedis(newaccessToken)
+        return newaccessToken
+        
     } catch (error) {
         if (error.name == 'TokenExpiredError') {
-            throw new UnauthorizedError('Sorry I can not do any thing')
+            throw new UnauthorizedError('Refresh Token Expired')
         }
 
-        throw new BadRequestError(error.message)
+        throw new BadRequestError(error)
     }
 }
 

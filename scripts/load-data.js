@@ -4,71 +4,81 @@ const Product = require('../src/models/products')
 const Chart = require('../src/models/analytics')
 const mongoose = require('mongoose');
 
-const loadData = async () => {
-    await mongoose.connect('mongodb+srv://goyalaadesh461:11710461Aa@cluster0.pykajlg.mongodb.net/?retryWrites=true&w=majority');
-    
+const connectMongoDb = async () => {
+    await mongoose.connect(mongoUri);
     console.log("Database Connected")
+}
+
+const loadFileData = async () => {
+    await connectMongoDb()
 
     const data = () => fs.readFileSync(__dirname + '/../data.json', {encoding: 'utf-8'});
     const fileData = JSON.parse(data())
-    
-    const usersData = fileData.users
-    for (index in usersData) {
-        const userData = usersData[index]
-        const existingUser = await User.findOne({email: userData.email})
-        
-        if(existingUser) {
-            continue
+
+    const users = fileData.users
+
+    for (var i = 0 ; i < users.length; i++) {
+        const user = users[i]
+        const existingUser = await User.findOne({email: user.email})
+        if (existingUser) {
+            console.log('User Already Exist')
         } else {
-            await User.create({
-                email: userData.email,
-                displayname: userData.displayname,
-                username: userData.username,
-                firstname: userData.firstname,
-                lastname: userData.lastname,
-                profile: userData.profile,
-                organization: userData.organization,
-                dob: userData.dob,
-                charts: userData.charts,
-                productFeatures: userData.productFeatures,
-                password: userData.password
-            })
-            console.log("usercreated:",index)
+            const newuser = await User.create({
+                email: user.email,
+                displayname: user.displayname,
+                username: user.username,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                profile: user.profile,
+                organization: user.organization,
+                dob: user.dob,
+                charts: user.charts,
+                productFeatures: user.productFeatures,
+                password: user.password
+            })   
+
+            console.log('User Created :', newuser._id)
         }
     }
 
-    const productsData = fileData.products
 
-    for (index in productsData) {
-        const productData = productsData[index]
-        await Product.create({
-            productId: productData.productId,
-            productName: productData.productName,
-            features: productData.features
+
+    const products = fileData.products
+    for (var i = 0 ; i < products.length; i++) {
+        const product = products[i]
+        const newproduct = await Product.create({
+            productId: product.productId,
+            productName: product.productName,
+            features: product.features
         })
 
-        console.log("productdatacreated:", index)
+        console.log('Product Created: ',newproduct._id)
     }
 
-    const chartsData = fileData.analytics
-    for (index in chartsData) {
-        const chartData = chartsData[index]
-        let local = chartData.locals
-        if (chartData.locals == undefined) {
+
+    const charts = fileData.analytics
+    for (var i = 0 ; i < charts.length; i++) {
+        const chart = charts[i]
+        let local = chart.locals
+        
+        if (chart.locals == undefined) {
             local = JSON.stringify({})
         } else {
-            local = JSON.stringify(chartData.locals)
+            local = JSON.stringify(chart.locals)
         }
-        await Chart.create({
-            chartId: chartData.chartId,
-            title: chartData.title,
-            dataType: chartData.dataType,
+        
+        const newchart = await Chart.create({
+            chartId: chart.chartId,
+            title: chart.title,
+            dataType: chart.dataType,
             locals: local,
-            data: JSON.stringify(chartData.data)
+            data: JSON.stringify(chart.data)
         })
 
-        console.log("chartcreated:",index)
+        console.log("Chart Data Created: ",newchart._id)
     }
+
+    return console.log('Complete data loaded in database')
 }
 
-loadData()
+loadFileData()

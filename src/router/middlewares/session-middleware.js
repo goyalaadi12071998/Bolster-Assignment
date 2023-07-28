@@ -4,6 +4,8 @@ const tokenservice = require('../../token/index')
 
 const isLoggedIn = async (req, res, next) => {
     const accessToken = req.headers['authorization'];
+
+    // If we have redis with ttl then we also check if token exist in redis or not
     
     if (!accessToken) {
         const err = new UnauthorizedError('Unauthorized Request')
