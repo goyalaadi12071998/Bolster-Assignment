@@ -5,7 +5,7 @@ const availableEnvs = {
 }
 
 const getEnv = () => {
-    env = process.env.APP_MODE
+    let env = process.env.APP_MODE
     if (env == undefined) {
         env = "dev"
     }

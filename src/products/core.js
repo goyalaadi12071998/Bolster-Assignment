@@ -6,7 +6,11 @@ const GetAllProducts = async (filter) => {
 } 
 
 const GetProductsDataForFeatures = async (featureIds) => {
-	const productsData = await Product.find({"features.featureId": {$in: featureIds}})
+	const featuresfilter = {
+		"features.featureId": {$in: featureIds}
+	}
+
+	const productsData = await FindAll(Product, featuresfilter)
 	return productsData
 }
 
