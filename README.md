@@ -10,20 +10,20 @@
         ```
     
     3. Run npm install
-    4. A data.json file is already exist with some data if you want to add some different data update the file
-        with the new data and check the data format should be same.
+    4. A data.json file already exists with some data if you want to add some different data update the file
+        with the new data and check the data format should be the same.
     
-    5  Add mongourl in mongoose.connect funtion in load-data.js script in place of *mongoUri*
+    5  Add mongourl in mongoose.connect function in load-data.js script in place of *mongoUri*
     6. Run node scripts/load-data.js
     7. After completing the script run node src/app.js
     8. Awesome, Now the server is running.
 
 # Note
-    1. Some code is commented in src/token/index.js which requires redis implementation so i commented the code.
-    2. Because of time boundation i did not integrate redis in this to store access token and refresh token in db 
-    3. All the validation of access token and refresh token is done without the use of redis and also necessary comments added
+    1. Some code is commented in src/token/index.js which requires Redis implementation so I commented the code.
+    2. Because of time boundation i did not integrate redis in this to store access token and refresh tokens in db 
+    3. All the validation of access token and refresh token is done without the use of Redis and also necessary comments added
 
-# Dependencies User
+# Dependencies Used
     1. Express
     2. Morgan
     3. Helmet
