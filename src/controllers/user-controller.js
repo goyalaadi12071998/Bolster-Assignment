@@ -51,7 +51,7 @@ const RefreshToken = async (req, res) => {
         res.set('X-Access-Token', token)
         Respond(req, res, null, null)
     } catch (error) {
-        Respond(req, res, null, err)
+        Respond(req, res, null, error)
     }
 }
 

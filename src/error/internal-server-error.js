@@ -3,7 +3,7 @@ class InternalServerError extends Error {
         super(message)
 
         this.statusCode = 500
-        this.desciption = message
+        this.description = message
         this.code = "INTERNAL_SERVER_ERROR"
     }
 }

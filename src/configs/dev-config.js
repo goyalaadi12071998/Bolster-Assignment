@@ -5,7 +5,7 @@ const configs = {
         Port: process.env.PORT || 3000
     },
     db: {
-        MongoUrl: "mongodb+srv://<username>:<password>@cluster0.pykajlg.mongodb.net/?retryWrites=true&w=majority" 
+        MongoUrl: "mongodb+srv://goyalaadesh461:11710461Aa@cluster0.pykajlg.mongodb.net/?retryWrites=true&w=majority" 
     }
 }
 

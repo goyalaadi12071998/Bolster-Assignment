@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { UnauthorizedError } = require("../error");
+const { UnauthorizedError, BadRequestError } = require("../error");
 
 let jwt_user_token_map = {}
 
@@ -13,7 +13,8 @@ const generateRefreshToken = async (refreshTokenPayload) => {
 
 const storeTokenInRedis = (userid, token) => {
     // We have to store token in redis
-    // For the time bounding we are creating a map and storing tokens
+    // Because of the time boundation we are creating a map and storing tokens
+    // Only work when system continuosly works because the variable will be reintialized if sever stoppes
 
     const refreshTokenKey = "refresh_token"+userid
 
@@ -80,23 +81,31 @@ const VerifyRefreshTokenAndGetData = async (token) => {
 }
 
 const GenerateAccessTokenForValidRefreshToken = async (userid, refreshToken) => {
-    // const refreshTokenFromStore = getUserRefreshTokensFromRedis(userid)
     
-    // if (!refreshToken || !refreshTokenFromStore) {
-    //     throw new BadRequestError('Unauthorized Error, Refresh Token Expires')
-    // }
-
-    // if (refreshToken != refreshTokenFromStore) {
-    //     throw new BadRequestError('Unauthorized Error, Refresh token does not match')
-    // }
-
-    const payload = await VerifyRefreshTokenAndGetData(refreshToken)
-    if (payload.isExpired) {
-        throw new UnauthorizedError('Refresh Token Expired, Login Again')
+    // This will only work when server runs without stopped because we are using a local variable instead of redis.
+    // Commenting the code for now.
+    
+    const refreshTokenFromStore = getUserRefreshTokensFromRedis(userid)
+    
+    if (!refreshToken || !refreshTokenFromStore) {
+        throw new BadRequestError('Unauthorized Error, Refresh Token Expires')
     }
 
-    if (!(payload.userid == userid)) {
-        throw new UnauthorizedError('Sorry I can not do any thing')
+    if (refreshToken != refreshTokenFromStore) {
+        throw new BadRequestError('Unauthorized Error, Refresh token does not match')
+    }
+
+    try {
+        const payload = await VerifyRefreshTokenAndGetData(refreshToken)
+        if (!(payload.userid == userid)) {
+            throw new UnauthorizedError('Sorry I can not do any thing')
+        }    
+    } catch (error) {
+        if (error.name == 'TokenExpiredError') {
+            throw new UnauthorizedError('Sorry I can not do any thing')
+        }
+
+        throw new BadRequestError('Error in validating data')
     }
 
     const newpaylaod = {

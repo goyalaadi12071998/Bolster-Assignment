@@ -15,7 +15,7 @@ const Respond = (req, res, payload, error) => {
     if (error != null) {
         return res.status(error.statusCode).send({
             success: false,
-            message: error.desciption,
+            message: error.description,
             code: error.code
         })
     }
