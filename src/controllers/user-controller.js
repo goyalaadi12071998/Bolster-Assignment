@@ -45,9 +45,9 @@ const GetProfileData = async (req, res) => {
 
 const RefreshToken = async (req, res) => {
     try {
-        const userid = req.headers['X-User-Id']
-        const refreshToken = req.headers['X-Refresh-Token']
-        const token = tokenservice.GenerateAccessTokenForValidRefreshToken(userid, refreshToken)
+        const userid = req.headers['x-user-id']
+        const refreshToken = req.headers['x-refresh-token']
+        const token = await tokenservice.GenerateAccessTokenForValidRefreshToken(userid, refreshToken)
         res.set('X-Access-Token', token)
         Respond(req, res, null, null)
     } catch (error) {

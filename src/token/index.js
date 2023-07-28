@@ -11,16 +11,20 @@ const generateRefreshToken = async (refreshTokenPayload) => {
     return await jwt.sign(refreshTokenPayload, 'REFRESH_TOKEN_SECRET', {expiresIn: '24h'})
 }
 
-const storeTokenInRedis = async (userid, token) => {
+const storeTokenInRedis = (userid, token) => {
     // We have to store token in redis
     // For the time bounding we are creating a map and storing tokens
 
     const refreshTokenKey = "refresh_token"+userid
 
+    if (jwt_user_token_map[refreshTokenKey]) {
+        delete jwt_user_token_map[refreshTokenKey]
+    }
+    
     jwt_user_token_map[refreshTokenKey] = token
 }
 
-const getUserTokensFromRedis = async (userid) => {
+const getUserTokensFromRedis = (userid) => {
     // We have used map insted of redis for coding purpose
 
     const refreshTokenKey = "refresh_token"+userid
@@ -48,7 +52,7 @@ const CreateAccessTokenForUser = async (user) => {
         refreshToken: refreshToken
     }
 
-    await storeTokenInRedis(user._id, token.refreshToken)
+    storeTokenInRedis(user._id, token.refreshToken)
 
     return token
 }

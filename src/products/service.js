@@ -13,8 +13,29 @@ const FetchUserProducts = async (data) => {
     }
     const userdata = await userservice.GetProfileData(profilefilter)
     const userproductFeatureIds = userdata.productFeatures
-    const productsData = await productscore.GetProductsDataForFeatures()
-    return productsData
+    const productsData = await productscore.GetProductsDataForFeatures(userproductFeatureIds)
+
+    var response = [];
+    for (index in productsData) {
+        let productData = productsData[index]
+        let features = []
+
+        for (index2 in productData.features) {
+            if (userproductFeatureIds.includes(productData.features[index2].featureId)) {
+                features.push(productData.features[index2])
+            }
+        }
+
+        let tempResponse = {
+            productId: productData.productId,
+            productName: productData.productName,
+            features: features
+        }
+
+        response.push(tempResponse)
+    }
+
+    return response
 }
 
 module.exports = {

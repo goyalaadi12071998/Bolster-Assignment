@@ -7,6 +7,6 @@ router.post('/login', controllers.UserController.LoginUser)
 router.get('/profile', isLoggedIn, controllers.UserController.GetProfileData)
 router.get('/list-products', controllers.ProductController.ListAllProducts)
 router.get('/my-products', isLoggedIn, controllers.ProductController.FetchUserProducts)
-router.get('/refresh-token', controllers.UserController.RefreshToken)
+router.post('/refresh-token', controllers.UserController.RefreshToken)
 
 module.exports = router
