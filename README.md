@@ -22,3 +22,15 @@
     1. Some code is commented in src/token/index.js which requires redis implementation so i commented the code.
     2. Because of time boundation i did not integrate redis in this to store access token and refresh token in db 
     3. All the validation of access token and refresh token is done without the use of redis and also necessary comments added
+
+# Dependencies User
+    1. Express
+    2. Morgan
+    3. Helmet
+    4. Cors
+    5. Cookie-Parser
+    6. Body-Parser
+    7. JsonWebTokens
+    8. Express-Mongo-Sanitize
+    9. Xss-clean
+    10. Bcrypt
