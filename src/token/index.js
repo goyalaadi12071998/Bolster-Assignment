@@ -85,15 +85,15 @@ const GenerateAccessTokenForValidRefreshToken = async (userid, refreshToken) => 
     // This will only work when server runs without stopped because we are using a local variable instead of redis.
     // Commenting the code for now.
     
-    const refreshTokenFromStore = getUserRefreshTokensFromRedis(userid)
+    // const refreshTokenFromStore = getUserRefreshTokensFromRedis(userid)
     
-    if (!refreshToken || !refreshTokenFromStore) {
-        throw new BadRequestError('Unauthorized Error, Refresh Token Expires')
-    }
+    // if (!refreshToken || !refreshTokenFromStore) {
+    //     throw new BadRequestError('Unauthorized Error, Refresh Token Expires')
+    // }
 
-    if (refreshToken != refreshTokenFromStore) {
-        throw new BadRequestError('Unauthorized Error, Refresh token does not match')
-    }
+    // if (refreshToken != refreshTokenFromStore) {
+    //     throw new BadRequestError('Unauthorized Error, Refresh token does not match')
+    // }
 
     try {
         const payload = await VerifyRefreshTokenAndGetData(refreshToken)
