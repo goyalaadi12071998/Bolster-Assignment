@@ -33,13 +33,6 @@ const getUserRefreshTokensFromRedis = (userid) => {
     return jwt_user_token_map[refreshTokenKey]
 }
 
-const isExpired = (expiryUnixTime) => {
-    const currentUnixTime = Date.now()
-    return (expiryUnixTime - currentUnixTime > 0)
-}
-
-
-
 const CreateAccessTokenForUser = async (user) => {
     const payload = {
         id: user._id
@@ -60,22 +53,18 @@ const CreateAccessTokenForUser = async (user) => {
 
 const VerifyAccessTokenAndGetData = async (token) => {
     const data = await jwt.verify(token, 'ACCESS_TOKEN_SECRET')
-    const istokenExpired = isExpired(data.exp)
     const userid = data.id
 
     return {
-        isExpired: istokenExpired,
         userid: userid
     }
 }
 
 const VerifyRefreshTokenAndGetData = async (token) => {
     const data = await jwt.verify(token, 'REFRESH_TOKEN_SECRET')
-    const istokenExpired = isExpired(data.exp)
     const userid = data.id
 
     return {
-        isExpired: istokenExpired,
         userid: userid
     }
 }
@@ -95,23 +84,26 @@ const GenerateAccessTokenForValidRefreshToken = async (userid, refreshToken) => 
     //     throw new BadRequestError('Unauthorized Error, Refresh token does not match')
     // }
 
+    // Asking user id to verify if it is accessing the refreshing token for the correct user
+
     try {
         const payload = await VerifyRefreshTokenAndGetData(refreshToken)
         if (!(payload.userid == userid)) {
-            throw new UnauthorizedError('Sorry I can not do any thing')
+            throw new UnauthorizedError('Refresh Token Id and User id does not match')
         }    
+
+        const newpaylaod = {
+            id: payload.userid
+        }
+
+        return  await generateAccessToken(newpaylaod)
     } catch (error) {
         if (error.name == 'TokenExpiredError') {
             throw new UnauthorizedError('Sorry I can not do any thing')
         }
 
-        throw new BadRequestError('Error in validating data')
+        throw new BadRequestError(error.message)
     }
-
-    const newpaylaod = {
-        id: userid
-    }
-    return  await generateAccessToken(newpaylaod)
 }
 
 module.exports = {

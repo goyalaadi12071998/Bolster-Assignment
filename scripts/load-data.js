@@ -5,17 +5,18 @@ const Chart = require('../src/models/analytics')
 const mongoose = require('mongoose');
 
 const loadData = async () => {
-    await mongoose.connect(process.env.MONGO_URL);
+    await mongoose.connect('mongodb+srv://goyalaadesh461:11710461Aa@cluster0.pykajlg.mongodb.net/?retryWrites=true&w=majority');
     
     console.log("Database Connected")
 
     const data = () => fs.readFileSync(__dirname + '/../data.json', {encoding: 'utf-8'});
     const fileData = JSON.parse(data())
+    
     const usersData = fileData.users
-
     for (index in usersData) {
         const userData = usersData[index]
-        const existingUser = await User.find({email: userData.email})
+        const existingUser = await User.findOne({email: userData.email})
+        
         if(existingUser) {
             continue
         } else {
@@ -32,7 +33,6 @@ const loadData = async () => {
                 productFeatures: userData.productFeatures,
                 password: userData.password
             })
-
             console.log("usercreated:",index)
         }
     }

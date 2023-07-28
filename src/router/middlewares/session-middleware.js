@@ -13,11 +13,6 @@ const isLoggedIn = async (req, res, next) => {
 
     try {
         const payload = await tokenservice.VerifyAccessTokenAndGetData(accessToken)
-        if (payload.isExpired) {
-            const err = new UnauthorizedError('Unauthorized Request')
-            Respond(req, res, null, err)
-            return
-        }
         req.userid = payload.userid
         next()
     } catch (error) {
