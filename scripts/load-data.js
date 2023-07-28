@@ -37,38 +37,38 @@ const loadData = async () => {
         }
     }
 
-    // const productsData = fileData.products
+    const productsData = fileData.products
 
-    // for (index in productsData) {
-    //     const productData = productsData[index]
-    //     await Product.create({
-    //         productId: productData.productId,
-    //         productName: productData.productName,
-    //         features: productData.features
-    //     })
+    for (index in productsData) {
+        const productData = productsData[index]
+        await Product.create({
+            productId: productData.productId,
+            productName: productData.productName,
+            features: productData.features
+        })
 
-    //     console.log("productdatacreated:", index)
-    // }
+        console.log("productdatacreated:", index)
+    }
 
-    // const chartsData = fileData.analytics
-    // for (index in chartsData) {
-    //     const chartData = chartsData[index]
-    //     let local = chartData.locals
-    //     if (chartData.locals == undefined) {
-    //         local = JSON.stringify({})
-    //     } else {
-    //         local = JSON.stringify(chartData.locals)
-    //     }
-    //     await Chart.create({
-    //         chartId: chartData.chartId,
-    //         title: chartData.title,
-    //         dataType: chartData.dataType,
-    //         locals: local,
-    //         data: JSON.stringify(chartData.data)
-    //     })
+    const chartsData = fileData.analytics
+    for (index in chartsData) {
+        const chartData = chartsData[index]
+        let local = chartData.locals
+        if (chartData.locals == undefined) {
+            local = JSON.stringify({})
+        } else {
+            local = JSON.stringify(chartData.locals)
+        }
+        await Chart.create({
+            chartId: chartData.chartId,
+            title: chartData.title,
+            dataType: chartData.dataType,
+            locals: local,
+            data: JSON.stringify(chartData.data)
+        })
 
-    //     console.log("chartcreated:",index)
-    // }
+        console.log("chartcreated:",index)
+    }
 }
 
 loadData()
