@@ -24,7 +24,7 @@ const storeTokenInRedis = (userid, token) => {
     jwt_user_token_map[refreshTokenKey] = token
 }
 
-const getUserTokensFromRedis = (userid) => {
+const getUserRefreshTokensFromRedis = (userid) => {
     // We have used map insted of redis for coding purpose
 
     const refreshTokenKey = "refresh_token"+userid
@@ -80,10 +80,15 @@ const VerifyRefreshTokenAndGetData = async (token) => {
 }
 
 const GenerateAccessTokenForValidRefreshToken = async (userid, refreshToken) => {
-    const refreshTokenFromStore = getUserTokensFromRedis(userid)
-    if (!refreshToken) {
-        throw new BadRequestError('Unauthorized Error')
-    }
+    // const refreshTokenFromStore = getUserRefreshTokensFromRedis(userid)
+    
+    // if (!refreshToken || !refreshTokenFromStore) {
+    //     throw new BadRequestError('Unauthorized Error, Refresh Token Expires')
+    // }
+
+    // if (refreshToken != refreshTokenFromStore) {
+    //     throw new BadRequestError('Unauthorized Error, Refresh token does not match')
+    // }
 
     const payload = await VerifyRefreshTokenAndGetData(refreshToken)
     if (payload.isExpired) {
@@ -95,7 +100,7 @@ const GenerateAccessTokenForValidRefreshToken = async (userid, refreshToken) => 
     }
 
     const newpaylaod = {
-        userid: userid
+        id: userid
     }
     return  await generateAccessToken(newpaylaod)
 }

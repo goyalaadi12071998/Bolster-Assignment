@@ -6,12 +6,16 @@ const isLoggedIn = async (req, res, next) => {
     const accessToken = req.headers['authorization'];
     
     if (!accessToken) {
-        Respond(req, res, null, new BadRequestError('Unauthorized Request'))
+        const err = new BadRequestError('Unauthorized Request')
+        Respond(req, res, null, err)
+        return
     }
 
     const payload = await tokenservice.VerifyAccessTokenAndGetData(accessToken)
     if (payload.isExpired) {
-        Respond(req, res, null, new BadRequestError('Unauthorized Request'))
+        const err = new BadRequestError('Unauthorized Request')
+        Respond(req, res, null, err)
+        return
     }
 
     req.userid = payload.userid
