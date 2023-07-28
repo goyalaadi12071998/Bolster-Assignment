@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { BadRequestError } = require("../error");
+const { UnauthorizedError } = require("../error");
 
 let jwt_user_token_map = {}
 
@@ -92,11 +92,11 @@ const GenerateAccessTokenForValidRefreshToken = async (userid, refreshToken) => 
 
     const payload = await VerifyRefreshTokenAndGetData(refreshToken)
     if (payload.isExpired) {
-        throw new BadRequestError('Refresh Token Expired, Login Again')
+        throw new UnauthorizedError('Refresh Token Expired, Login Again')
     }
 
     if (!(payload.userid == userid)) {
-        throw new BadRequestError('Sorry I can not do any thing')
+        throw new UnauthorizedError('Sorry I can not do any thing')
     }
 
     const newpaylaod = {
