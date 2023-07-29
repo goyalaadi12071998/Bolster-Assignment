@@ -1,7 +1,7 @@
 const {Respond} = require('../utils/index')
 const errors = require('../error/index')
 const userservice = require('../user/service')
-const tokenservice = require('../token/index')
+const tokenservice = require('../token/jwt-token')
 
 const LoginUser = async (req, res) => {
     const {email, password} = req.body
@@ -18,15 +18,28 @@ const LoginUser = async (req, res) => {
 
     try {
         const payload = await userservice.LoginUser(loginData)
-        const token = await tokenservice.CreateAccessTokenForUser(payload)
+        const accessToken = await tokenservice.CreateAccessTokenForUser(payload.id)
+        const refreshToken = await tokenservice.CreateRefreshTokenForUser(payload.id)
         
-        res.set('X-User-Id', payload._id)
-        res.set('X-Access-Token', token.accessToken)
-        res.set('X-Refresh-Token', token.refreshToken)
+        res.set('x-user-id', payload._id)
+        res.set('x-access-token', accessToken)
+        res.set('x-refresh-token', refreshToken)
         
         Respond(req, res, payload, null)
     } catch (err) {
         Respond(req, res, null, err)
+    }
+}
+
+const Logout = async (req, res) => {
+    try {
+        const userId = req.headers['x-user-id']
+        await tokenservice.DeleteTokensForUser(userId)
+        Respond(req, res, null, null)
+        return
+    } catch (error) {
+        Respond(req, res, null, error)
+        return
     }
 }
 
@@ -47,8 +60,17 @@ const RefreshToken = async (req, res) => {
     try {
         const userid = req.headers['x-user-id']
         const refreshToken = req.headers['x-refresh-token']
-        const token = await tokenservice.GenerateAccessTokenForValidRefreshToken(userid, refreshToken)
-        res.set('X-Access-Token', token)
+
+        if (!userid || !refreshToken) {
+            throw new errors.BadRequestError('UserId or RefreshToken is not set in headers')
+        }
+        
+        await tokenservice.VerifyRefreshToken(userid, refreshToken)
+        await tokenservice.CreateAccessTokenForUser(userid)
+
+        const accessToken = await tokenservice.CreateNewAccessTokenForRefreshToken(userid)
+        res.set('x-access-token', accessToken)
+
         Respond(req, res, null, null)
     } catch (error) {
         Respond(req, res, null, error)
@@ -58,5 +80,6 @@ const RefreshToken = async (req, res) => {
 module.exports = {
     LoginUser,
     RefreshToken,
-    GetProfileData
+    GetProfileData,
+    Logout
 }
