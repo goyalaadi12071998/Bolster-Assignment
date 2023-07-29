@@ -34,6 +34,3 @@
     8. Express-Mongo-Sanitize
     9. Xss-clean
     10. Bcrypt
-
-# Postman Collection Link
-    Link - https://api.postman.com/collections/9123322-36bd8a32-e29a-43c4-b991-249f79d020c0?access_key=PMAT-01H6E5BHCYRABSV1VWSY6HASJT
