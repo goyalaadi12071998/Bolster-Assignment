@@ -5,7 +5,15 @@ const { InternalServerError } = require('../../error');
 var redisclient;
 
 const connectRedis = async () => {
-    const client = redis.createClient()
+    let client;
+    if(process.env.APP_MODE == 'docker') {
+        client = redis.createClient({
+            url: "redis://host.docker.internal:6379"
+        })
+    } else {
+        client = redis.createClient()
+    }
+    
     try {
         await client.connect()
         console.log('Redis connected successfully')

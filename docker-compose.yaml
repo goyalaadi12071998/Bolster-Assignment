@@ -1,5 +1,10 @@
 version: '3'
 services: 
+  redis:
+    image: redis:latest
+    network_mode: host
+    ports:
+      - "6379:6379"
   mongo-server:
     image: mongo
   node-server:
