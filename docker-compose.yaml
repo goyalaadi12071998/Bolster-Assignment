@@ -1,0 +1,13 @@
+version: '3'
+services: 
+  mongo-server:
+    image: mongo
+  node-server:
+    build: .
+    restart: on-failure
+    ports: 
+      - 3000:3000
+    environment:
+      - APP_MODE=docker
+      - PORT=3000
+      - MONGO_URL=

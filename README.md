@@ -15,8 +15,11 @@
     
     5  Add mongourl in mongoose.connect function in load-data.js script in place of *mongoUri*
     6. Run node scripts/load-data.js
+    
     7. After completing the script run node src/app.js
     8. Awesome, Now the server is running.
+    9. If step 7 does not works for you , then add PORT and MongoURl in docker-compose.yaml file
+    10. Run docker-compose up --build
 
 # Note
     1. Some code is commented in src/token/index.js which requires Redis implementation so I commented the code.

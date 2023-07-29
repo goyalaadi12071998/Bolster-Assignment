@@ -11,9 +11,7 @@ const cookieParser = require("cookie-parser");
 const mongoSanitize = require('express-mongo-sanitize');
 const bodyParser = require('body-parser');
 
-const getConfigs = require('./configs/index')
 const connectDB = require('./providers/db/index');
-const getEnv = require('./common/env')
 const NotFoundHandler = require('./router/middlewares/notfoundhandler-middleware')
 
 const v1routes = require('./router') 
@@ -29,13 +27,10 @@ app.use(bodyParser.json())
 app.use('/api/v1', v1routes)
 app.use(NotFoundHandler)
 
-const env = getEnv()
-const configs = getConfigs(env)
-
 const start = async () => {
     try {
-        await connectDB(configs.db.MongoUrl)
-        var server = app.listen(configs.core.Port, () => {console.log("Server is listening on port: ", configs.core.Port)})
+        await connectDB(process.env.MONGO_URL)
+        var server = app.listen(process.env.PORT, () => {console.log("Server is listening on port: ", process.env.PORT)})
 
         process.on("SIGTERM", () => {
             server.close(() => { console.log("Closing Server") })
