@@ -34,6 +34,9 @@ const LoginUser = async (req, res) => {
 const Logout = async (req, res) => {
     try {
         const userId = req.headers['x-user-id']
+        if(!userId) {
+            throw new errors.BadRequestError('UsedId is not set in headers')
+        }
         await tokenservice.DeleteTokensForUser(userId)
         Respond(req, res, null, null)
         return

@@ -9,6 +9,6 @@ router.get('/list-products', controllers.ProductController.ListAllProducts)
 router.get('/my-products', isLoggedIn, controllers.ProductController.FetchUserProducts)
 router.post('/refresh-token', controllers.UserController.RefreshToken)
 router.get('/analytics', isLoggedIn, controllers.ChartController.GetChartsForUser)
-router.get('/logout', controllers.UserController.Logout)
+router.post('/logout', controllers.UserController.Logout)
 
 module.exports = router
