@@ -1,33 +1,27 @@
 const { Respond } = require('../../utils/index')
-const { UnauthorizedError, InternalServerError } = require('../../error')
-const tokenservice = require('../../token/index')
+const { BadRequestError, UnauthorizedError } = require('../../error')
+const tokenservice = require('../../token/jwt-token')
 
 const isLoggedIn = async (req, res, next) => {
-    const accessToken = req.headers['authorization'];
-
-    // If we have redis with ttl then we also check if token exist in redis or not
+    const userid = req.headers['x-user-id']
+    const accessToken =  req.headers['x-access-token']
     
-    if (!accessToken) {
-        const err = new UnauthorizedError('Unauthorized Request')
-        Respond(req, res, null, err)
+    if (!userid || !accessToken) {
+        const error = new BadRequestError('UserId or AccessToken is not set in headers')
+        Respond(req, res, null, error)
         return
     }
-
+    
     try {
-        const payload = await tokenservice.VerifyAccessTokenAndGetData(accessToken)
-        req.userid = payload.userid
+        await tokenservice.VerifyAccessToken(userid, accessToken)
+        req.userid = userid
         next()
     } catch (error) {
-        if (error.name = 'TokenExpiredError') {
-            const err = new UnauthorizedError('Unauthorized Request')
-            Respond(req, res, null, err)
-            return
-        }
-
-        const err = new InternalServerError('Error in validating data')
+        const err = new UnauthorizedError(error.message)
         Respond(req, res, null, err)
         return
     }
+
 }
 
 module.exports = {isLoggedIn}

@@ -12,6 +12,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const bodyParser = require('body-parser');
 
 const connectDB = require('./providers/db/index');
+const redisClient = require('./providers/redis/index')
 const NotFoundHandler = require('./router/middlewares/notfoundhandler-middleware')
 
 const v1routes = require('./router') 
@@ -30,6 +31,7 @@ app.use(NotFoundHandler)
 const start = async () => {
     try {
         await connectDB(process.env.MONGO_URL)
+        await redisClient.connectRedis()
         var server = app.listen(process.env.PORT, () => {console.log("Server is listening on port: ", process.env.PORT)})
 
         process.on("SIGTERM", () => {
