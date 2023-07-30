@@ -21,11 +21,6 @@
     9. If step 7 does not works for you , then add PORT and MongoURl in docker-compose.yaml file
     10. Run docker-compose up --build
 
-# Note
-    1. Some code is commented in src/token/index.js which requires Redis implementation so I commented the code.
-    2. Because of time boundation i did not integrate redis in this to store access token and refresh tokens in db 
-    3. All the validation of access token and refresh token is done without the use of Redis and also necessary comments added
-
 # Dependencies Used
     1. Express
     2. Morgan
@@ -37,3 +32,4 @@
     8. Express-Mongo-Sanitize
     9. Xss-clean
     10. Bcrypt
+    11. Redis
